@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DRIVORA — Driver Vigilance System</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #0a0a0a;
+    --white: #f4f0e8;
+    --gray: #1a1a1a;
+    --mid: #2a2a2a;
+    --muted: #666;
+    --accent: #e8ff47;
+    --red: #ff3b3b;
+    --orange: #ff8c42;
+    --green: #3bff8c;
+    --blue: #47c8ff;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ─────────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 3rem;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.08em;
+    color: var(--white);
+  }
+  .nav-logo span { color: var(--accent); }
+
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.82rem; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  .nav-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; padding: 0.35rem 0.8rem;
+    border: 1px solid var(--accent);
+    color: var(--accent); border-radius: 2px;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── HERO ─────────────────────────────────── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 8rem 3rem 4rem;
+    position: relative;
+    overflow: hidden;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40%; right: -20%;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(232,255,71,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.12em;
+    color: var(--accent); text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .hero-tag::before {
+    content: '';
+    display: inline-block; width: 24px; height: 1px;
+    background: var(--accent);
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 10vw, 8.5rem);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    margin-bottom: 2rem;
+  }
+  .hero-title span { color: var(--accent); }
+
+  .hero-subtitle {
+    font-size: 1.05rem; font-weight: 300;
+    color: rgba(244,240,232,0.6);
+    line-height: 1.75; max-width: 480px;
+    margin-bottom: 3rem;
+  }
+
+  .hero-cta {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--accent); color: var(--black);
+    font-weight: 600; font-size: 0.85rem;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.9rem 2rem; border: none; cursor: pointer;
+    text-decoration: none; display: inline-block;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(232,255,71,0.25); }
+
+  .btn-outline {
+    background: transparent; color: var(--white);
+    font-weight: 500; font-size: 0.85rem;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.9rem 2rem;
+    border: 1px solid rgba(255,255,255,0.2);
+    cursor: pointer; text-decoration: none; display: inline-block;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--white); }
+
+  /* Hero right — fake camera feed */
+  .hero-visual {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .camera-frame {
+    width: 100%; max-width: 460px;
+    aspect-ratio: 4/3;
+    background: var(--gray);
+    border: 1px solid rgba(255,255,255,0.08);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .camera-scanline {
+    position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.4;
+    animation: scan 3s linear infinite;
+  }
+  @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+  .camera-corner {
+    position: absolute; width: 18px; height: 18px;
+    border-color: var(--accent); border-style: solid; opacity: 0.7;
+  }
+  .camera-corner.tl { top: 12px; left: 12px; border-width: 2px 0 0 2px; }
+  .camera-corner.tr { top: 12px; right: 12px; border-width: 2px 2px 0 0; }
+  .camera-corner.bl { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; }
+  .camera-corner.br { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
+
+  .camera-face {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -52%);
+    width: 140px; height: 170px;
+    border: 1px solid rgba(232,255,71,0.3);
+    border-radius: 50%;
+  }
+
+  .camera-eyes {
+    position: absolute;
+    top: 38%; left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex; gap: 36px;
+  }
+  .eye-dot {
+    width: 10px; height: 10px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--green);
+    animation: blink 3.5s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 90%, 100% { transform: scaleY(1); opacity: 1; }
+    93%, 97% { transform: scaleY(0.1); opacity: 0.4; }
+  }
+
+  .camera-status-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.7);
+    padding: 0.6rem 1rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .cam-status {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; color: var(--green);
+    letter-spacing: 0.1em;
+  }
+  .cam-score {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; color: var(--white);
+  }
+
+  .cam-rec {
+    position: absolute; top: 14px; right: 48px;
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; color: var(--red); letter-spacing: 0.1em;
+  }
+  .rec-dot {
+    width: 7px; height: 7px; background: var(--red);
+    border-radius: 50%; animation: pulse-rec 1.2s ease-in-out infinite;
+  }
+  @keyframes pulse-rec { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+  /* Vigilance bar below camera */
+  .vig-bar-wrap {
+    margin-top: 1rem; width: 100%; max-width: 460px;
+  }
+  .vig-label {
+    display: flex; justify-content: space-between;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem; color: var(--muted);
+    margin-bottom: 0.4rem; letter-spacing: 0.08em;
+  }
+  .vig-label span { color: var(--green); }
+  .vig-track {
+    height: 4px; background: rgba(255,255,255,0.08);
+    border-radius: 2px; overflow: hidden;
+  }
+  .vig-fill {
+    height: 100%; width: 87%;
+    background: linear-gradient(90deg, var(--green), var(--accent));
+    animation: vig-pulse 4s ease-in-out infinite;
+  }
+  @keyframes vig-pulse {
+    0%, 100% { width: 87%; }
+    40% { width: 92%; }
+    70% { width: 82%; }
+  }
+
+  /* ── STATS STRIP ──────────────────────────── */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .stat-cell {
+    padding: 2.5rem 3rem;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+  .stat-cell:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.2rem; line-height: 1;
+    color: var(--accent); margin-bottom: 0.4rem;
+  }
+  .stat-label {
+    font-size: 0.78rem; font-weight: 400;
+    color: var(--muted); letter-spacing: 0.04em;
+    line-height: 1.4;
+  }
+
+  /* ── HOW IT WORKS ─────────────────────────── */
+  .section {
+    padding: 7rem 3rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+
+  .section-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.14em;
+    color: var(--accent); text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    line-height: 1; margin-bottom: 4rem;
+  }
+
+  .flow-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .flow-cell {
+    padding: 2rem 1.8rem;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    position: relative;
+    transition: background 0.2s;
+  }
+  .flow-cell:last-child { border-right: none; }
+  .flow-cell:hover { background: rgba(255,255,255,0.02); }
+
+  .flow-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; color: var(--accent);
+    letter-spacing: 0.1em; margin-bottom: 1.2rem;
+  }
+
+  .flow-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem; letter-spacing: 0.05em;
+    margin-bottom: 0.8rem; color: var(--white);
+  }
+
+  .flow-body {
+    font-size: 0.82rem; font-weight: 300;
+    color: rgba(244,240,232,0.55); line-height: 1.7;
+  }
+
+  .flow-arrow {
+    position: absolute; right: -14px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem; color: rgba(255,255,255,0.15);
+    z-index: 2;
+  }
+
+  /* ── LIVE DASHBOARD ───────────────────────── */
+  .dashboard-section {
+    background: var(--gray);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 5rem 3rem;
+  }
+
+  .dash-inner { max-width: 1200px; margin: 0 auto; }
+
+  .dash-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 3rem;
+  }
+
+  .dash-live {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; color: var(--green); letter-spacing: 0.1em;
+  }
+  .live-dot {
+    width: 7px; height: 7px; background: var(--green);
+    border-radius: 50%; animation: pulse-rec 1.2s ease-in-out infinite;
+  }
+
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1px;
+    background: rgba(255,255,255,0.06);
+  }
+
+  .dash-card {
+    background: var(--gray);
+    padding: 1.8rem 2rem;
+  }
+
+  .dash-card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.12em;
+    color: var(--muted); text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  /* Big score card */
+  .score-display {
+    display: flex; align-items: baseline; gap: 0.5rem;
+    margin-bottom: 1.2rem;
+  }
+  .score-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5rem; line-height: 1;
+    color: var(--green);
+    transition: color 0.5s;
+  }
+  .score-unit {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem; color: var(--muted);
+  }
+
+  .score-bar-track {
+    height: 6px; background: rgba(255,255,255,0.08);
+    border-radius: 3px; overflow: hidden; margin-bottom: 0.6rem;
+  }
+  .score-bar-fill {
+    height: 100%; background: var(--green);
+    transition: width 0.8s ease, background 0.5s;
+    width: 87%;
+  }
+
+  .score-status {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 0.1em;
+    color: var(--green);
+  }
+
+  /* Metric cards */
+  .metric-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem; line-height: 1; color: var(--white);
+    margin-bottom: 0.3rem;
+  }
+  .metric-sub {
+    font-size: 0.75rem; color: var(--muted); font-weight: 300;
+  }
+
+  /* Alert log */
+  .alert-log {
+    margin-top: 1px; background: var(--gray);
+    grid-column: 1 / -1; padding: 1.5rem 2rem;
+  }
+  .log-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.12em;
+    color: var(--muted); text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .log-entries { display: flex; flex-direction: column; gap: 0.5rem; }
+  .log-entry {
+    display: flex; gap: 1.5rem; align-items: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; padding: 0.55rem 0.8rem;
+    background: rgba(0,0,0,0.3);
+    border-left: 2px solid transparent;
+    animation: fadeIn 0.4s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; } }
+  .log-entry.normal { border-color: var(--green); }
+  .log-entry.warning { border-color: var(--orange); }
+  .log-entry.alert  { border-color: var(--red); }
+  .log-time { color: var(--muted); min-width: 60px; }
+  .log-msg  { color: var(--white); }
+  .log-level { margin-left: auto; font-size: 0.62rem; letter-spacing: 0.1em; }
+  .log-entry.normal .log-level  { color: var(--green); }
+  .log-entry.warning .log-level { color: var(--orange); }
+  .log-entry.alert .log-level   { color: var(--red); }
+
+  /* Alert level cards */
+  .alerts-section {
+    padding: 7rem 3rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+
+  .alerts-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: rgba(255,255,255,0.06);
+    margin-top: 3rem;
+  }
+
+  .alert-card {
+    background: var(--black);
+    padding: 2.5rem 2rem;
+    position: relative; overflow: hidden;
+    transition: background 0.2s;
+  }
+  .alert-card:hover { background: rgba(255,255,255,0.02); }
+
+  .alert-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .alert-card.l1::before { background: var(--orange); }
+  .alert-card.l2::before { background: var(--red); }
+  .alert-card.l3::before { background: rgba(255,59,59,0.4); }
+
+  .alert-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4rem; line-height: 1;
+    opacity: 0.08; position: absolute;
+    top: 1rem; right: 1.5rem;
+  }
+
+  .alert-icon {
+    font-size: 1.5rem; margin-bottom: 1rem;
+  }
+
+  .alert-card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem; letter-spacing: 0.05em;
+    margin-bottom: 0.6rem;
+  }
+  .alert-card.l1 .alert-card-title { color: var(--orange); }
+  .alert-card.l2 .alert-card-title { color: var(--red); }
+  .alert-card.l3 .alert-card-title { color: rgba(255,59,59,0.6); }
+
+  .alert-trigger {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem; color: var(--muted);
+    letter-spacing: 0.06em; margin-bottom: 0.8rem;
+  }
+
+  .alert-desc {
+    font-size: 0.82rem; font-weight: 300;
+    color: rgba(244,240,232,0.5); line-height: 1.7;
+  }
+
+  /* ── FOOTER ───────────────────────────────── */
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 2.5rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem;
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem; letter-spacing: 0.08em;
+  }
+  .footer-logo span { color: var(--accent); }
+  .footer-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em;
+  }
+
+  /* ── RESPONSIVE ───────────────────────────── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-visual { display: none; }
+    .stats-strip { grid-template-columns: repeat(2, 1fr); }
+    .flow-grid { grid-template-columns: repeat(2, 1fr); }
+    .flow-cell { border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .dash-grid { grid-template-columns: 1fr; }
+    .alerts-grid { grid-template-columns: 1fr; }
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span>D</span>RIVORA</div>
+  <ul class="nav-links">
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#dashboard">Dashboard</a></li>
+    <li><a href="#alerts">Alert Levels</a></li>
+  </ul>
+  <div class="nav-badge">PROTOTYPE v1.0</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">Road Safety · AI Vigilance System</div>
+    <h1 class="hero-title">
+      <span>D</span>RI<br>VO<br>RA
+    </h1>
+    <p class="hero-subtitle">
+      AI-powered driver drowsiness detection that learns <em>your</em> normal first —
+      then watches for the moment you're not. Because the road doesn't pause when your eyes do.
+    </p>
+    <div class="hero-cta">
+      <a href="#dashboard" class="btn-primary">View Live Dashboard</a>
+      <a href="#how" class="btn-outline">How It Works</a>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div style="width:100%; max-width:460px;">
+      <div class="camera-frame">
+        <div class="camera-scanline"></div>
+        <div class="camera-corner tl"></div>
+        <div class="camera-corner tr"></div>
+        <div class="camera-corner bl"></div>
+        <div class="camera-corner br"></div>
+        <div class="cam-rec"><div class="rec-dot"></div>LIVE</div>
+        <div class="camera-face">
+          <div class="camera-eyes">
+            <div class="eye-dot"></div>
+            <div class="eye-dot" style="animation-delay:0.1s"></div>
+          </div>
+        </div>
+        <div class="camera-status-bar">
+          <span class="cam-status" id="camStatus">● NORMAL</span>
+          <span class="cam-score" id="camEar">EAR 0.28 · MAR 0.04</span>
+        </div>
+      </div>
+      <div class="vig-bar-wrap">
+        <div class="vig-label">
+          VIGILANCE SCORE <span id="vigPct">87 / 100</span>
+        </div>
+        <div class="vig-track"><div class="vig-fill" id="vigFill"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stat-cell">
+    <div class="stat-num">1 in 5</div>
+    <div class="stat-label">Fatal road crashes globally are linked to driver fatigue</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-num">400m</div>
+    <div class="stat-label">Driven blind during a single microsleep at highway speed</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-num">1.5L</div>
+    <div class="stat-label">Road deaths per year in India — fatigue is a major untracked cause</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-num">₹0</div>
+    <div class="stat-label">Extra hardware needed — just a camera that's already there</div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div id="how">
+  <div class="section">
+    <div class="section-tag">System Architecture</div>
+    <h2 class="section-title">How DRIVORA Works</h2>
+    <div class="flow-grid">
+      <div class="flow-cell">
+        <div class="flow-num">01 — CAPTURE</div>
+        <div class="flow-title">See</div>
+        <div class="flow-body">
+          Camera records your face continuously at real-time FPS using any standard webcam or built-in laptop camera. No special hardware required.
+        </div>
+        <div class="flow-arrow">›</div>
+      </div>
+      <div class="flow-cell">
+        <div class="flow-num">02 — ANALYZE</div>
+        <div class="flow-title">Measure</div>
+        <div class="flow-body">
+          OpenCV detects face and eyes frame by frame. Eye presence score, blink frequency, and face position are computed in real time.
+        </div>
+        <div class="flow-arrow">›</div>
+      </div>
+      <div class="flow-cell">
+        <div class="flow-num">03 — LEARN</div>
+        <div class="flow-title">Adapt</div>
+        <div class="flow-body">
+          First 30 seconds builds your personal baseline. Your threshold is set at 75% of YOUR normal — not a generic average. No two drivers are the same.
+        </div>
+        <div class="flow-arrow">›</div>
+      </div>
+      <div class="flow-cell">
+        <div class="flow-num">04 — ALERT</div>
+        <div class="flow-title">Act</div>
+        <div class="flow-body">
+          When vigilance drops, multi-level alerts fire progressively — audio beep, voice warning, emergency contact. Session is logged for review.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIVE DASHBOARD -->
+<div id="dashboard" class="dashboard-section">
+  <div class="dash-inner">
+    <div class="dash-header">
+      <div>
+        <div class="section-tag">Simulated Session</div>
+        <h2 class="section-title" style="margin-bottom:0">Live Dashboard</h2>
+      </div>
+      <div class="dash-live"><div class="live-dot"></div>MONITORING ACTIVE</div>
+    </div>
+
+    <div class="dash-grid">
+      <!-- Vigilance Score -->
+      <div class="dash-card">
+        <div class="dash-card-label">Vigilance Score</div>
+        <div class="score-display">
+          <div class="score-num" id="scoreNum">87</div>
+          <div class="score-unit">/ 100</div>
+        </div>
+        <div class="score-bar-track">
+          <div class="score-bar-fill" id="scoreBar"></div>
+        </div>
+        <div class="score-status" id="scoreStatus">● NORMAL — Eyes tracking normally</div>
+      </div>
+
+      <!-- Session Time -->
+      <div class="dash-card">
+        <div class="dash-card-label">Session Time</div>
+        <div class="metric-value" id="sessionTime">00:00</div>
+        <div class="metric-sub">Active monitoring duration</div>
+        <br>
+        <div class="dash-card-label" style="margin-top:1.5rem">Yawns Detected</div>
+        <div class="metric-value" id="yawnCount">0</div>
+        <div class="metric-sub">In last 5 minutes</div>
+      </div>
+
+      <!-- Alert Count -->
+      <div class="dash-card">
+        <div class="dash-card-label">Alerts Fired</div>
+        <div class="metric-value" id="alertCount">0</div>
+        <div class="metric-sub">This session</div>
+        <br>
+        <div class="dash-card-label" style="margin-top:1.5rem">Eye Score</div>
+        <div class="metric-value" id="eyeScore">1.00</div>
+        <div class="metric-sub">Current frame (0–1)</div>
+      </div>
+
+      <!-- Alert Log -->
+      <div class="alert-log">
+        <div class="log-title">Session Log</div>
+        <div class="log-entries" id="logEntries">
+          <div class="log-entry normal">
+            <span class="log-time">00:00</span>
+            <span class="log-msg">DRIVORA started — building personal baseline</span>
+            <span class="log-level">SYSTEM</span>
+          </div>
+          <div class="log-entry normal">
+            <span class="log-time">00:30</span>
+            <span class="log-msg">Baseline set — Eye score: 0.82 · Threshold: 0.61</span>
+            <span class="log-level">CALIBRATED</span>
+          </div>
+          <div class="log-entry normal">
+            <span class="log-time">00:31</span>
+            <span class="log-msg">Monitoring active — Status: NORMAL</span>
+            <span class="log-level">NORMAL</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ALERT LEVELS -->
+<div id="alerts">
+  <div class="alerts-section">
+    <div class="section-tag">Intervention System</div>
+    <h2 class="section-title">Alert Levels</h2>
+    <div class="alerts-grid">
+      <div class="alert-card l1">
+        <div class="alert-num">01</div>
+        <div class="alert-icon">🔔</div>
+        <div class="alert-card-title">Audio Beep</div>
+        <div class="alert-trigger">TRIGGER: Eyes closed 15+ consecutive frames</div>
+        <div class="alert-desc">
+          A sharp 880Hz beep fires instantly. Non-intrusive enough to wake a mildly drowsy driver without causing panic. Resets if driver recovers.
+        </div>
+      </div>
+      <div class="alert-card l2">
+        <div class="alert-num">02</div>
+        <div class="alert-icon">🗣</div>
+        <div class="alert-card-title">Voice Warning</div>
+        <div class="alert-trigger">TRIGGER: Severe drowsiness or 3+ yawns with low score</div>
+        <div class="alert-desc">
+          Text-to-speech voice warning — "Danger! Severe drowsiness detected. Please pull over immediately." Escalates every 8 seconds if unresolved.
+        </div>
+      </div>
+      <div class="alert-card l3">
+        <div class="alert-num">03</div>
+        <div class="alert-icon">📱</div>
+        <div class="alert-card-title">Emergency Contact</div>
+        <div class="alert-trigger">TRIGGER: No response to Level 2 (Roadmap)</div>
+        <div class="alert-desc">
+          Auto-SMS to pre-registered emergency contact with GPS location. Planned integration with OBD port to automatically reduce vehicle speed.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo"><span>D</span>RIVORA</div>
+  <div class="footer-text">OPEN THEME · ROAD SAFETY INNOVATION · HACKATHON 2025</div>
+  <div class="footer-text">Built with Python · OpenCV · pyttsx3</div>
+</footer>
+
+<script>
+// ── Simulated live dashboard ──────────────────────────
+let sessionSeconds = 0;
+let alertsFired    = 0;
+let yawns          = 0;
+let phase          = 'normal'; // normal | drowsy | alert | recover
+let phaseTimer     = 0;
+const phases       = ['normal','normal','normal','drowsy','alert','recover','normal','normal','drowsy','recover'];
+let phaseIdx       = 0;
+
+const scoreNum    = document.getElementById('scoreNum');
+const scoreBar    = document.getElementById('scoreBar');
+const scoreStatus = document.getElementById('scoreStatus');
+const sessionTime = document.getElementById('sessionTime');
+const yawnCount   = document.getElementById('yawnCount');
+const alertCount  = document.getElementById('alertCount');
+const eyeScoreEl  = document.getElementById('eyeScore');
+const logEntries  = document.getElementById('logEntries');
+const camStatus   = document.getElementById('camStatus');
+const camEar      = document.getElementById('camEar');
+
+function addLog(time, msg, type) {
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${type}`;
+  const lvl = type === 'normal' ? 'NORMAL' : type === 'warning' ? 'LEVEL 1' : 'LEVEL 2';
+  entry.innerHTML = `
+    <span class="log-time">${time}</span>
+    <span class="log-msg">${msg}</span>
+    <span class="log-level">${lvl}</span>`;
+  logEntries.appendChild(entry);
+  logEntries.scrollTop = logEntries.scrollHeight;
+}
+
+function formatTime(s) {
+  return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+}
+
+function tick() {
+  sessionSeconds++;
+  phaseTimer++;
+
+  // Advance phase every ~12 seconds
+  if (phaseTimer >= 12) {
+    phaseTimer = 0;
+    phaseIdx = (phaseIdx + 1) % phases.length;
+    phase = phases[phaseIdx];
+  }
+
+  let score, eyeS, status, color, logMsg, logType;
+  const t = formatTime(sessionSeconds);
+
+  if (phase === 'normal') {
+    score  = 82 + Math.round(Math.random() * 15);
+    eyeS   = (0.85 + Math.random() * 0.15).toFixed(2);
+    status = '● NORMAL — Eyes tracking normally';
+    color  = 'var(--green)';
+  } else if (phase === 'drowsy') {
+    score  = 35 + Math.round(Math.random() * 20);
+    eyeS   = (0.2 + Math.random() * 0.3).toFixed(2);
+    status = '⚠ DROWSY — Eyes closing';
+    color  = 'var(--orange)';
+    if (phaseTimer === 4) {
+      alertsFired++;
+      yawns++;
+      addLog(t, 'LEVEL 1 ALERT — Beep triggered. Eyes below threshold.', 'warning');
+    }
+  } else if (phase === 'alert') {
+    score  = Math.round(Math.random() * 25);
+    eyeS   = (Math.random() * 0.15).toFixed(2);
+    status = '🚨 ALERT! PULL OVER';
+    color  = 'var(--red)';
+    if (phaseTimer === 2) {
+      alertsFired++;
+      addLog(t, 'LEVEL 2 ALERT — Voice warning: "Please pull over immediately"', 'alert');
+    }
+  } else {
+    score  = 65 + Math.round(Math.random() * 20);
+    eyeS   = (0.6 + Math.random() * 0.3).toFixed(2);
+    status = '↑ RECOVERING — Vigilance improving';
+    color  = 'var(--blue)';
+    if (phaseTimer === 1) {
+      addLog(t, 'Driver recovered — monitoring resumed', 'normal');
+    }
+  }
+
+  score = Math.min(100, Math.max(0, score));
+  const ear = (parseFloat(eyeS) * 0.35).toFixed(2);
+
+  scoreNum.textContent    = score;
+  scoreNum.style.color    = color;
+  scoreBar.style.width    = score + '%';
+  scoreBar.style.background = color;
+  scoreStatus.textContent = status;
+  scoreStatus.style.color = color;
+  sessionTime.textContent = formatTime(sessionSeconds);
+  yawnCount.textContent   = yawns;
+  alertCount.textContent  = alertsFired;
+  eyeScoreEl.textContent  = eyeS;
+  camStatus.textContent   = phase === 'normal' ? '● NORMAL'
+                           : phase === 'drowsy' ? '⚠ DROWSY'
+                           : phase === 'alert'  ? '🚨 ALERT'
+                           : '↑ RECOVERING';
+  camStatus.style.color   = color;
+  camEar.textContent      = `EAR ${ear} · Score ${score}`;
+}
+
+setInterval(tick, 1000);
+</script>
+</body>
+</html>
