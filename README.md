@@ -37,4 +37,6 @@ python main.py
 
 ## Demo Video
 ▶ [Watch Demo](https://drive.google.com/file/d/1nQTDPVqGf8kMqc8njFGQV9NoNOBbn7EW/view?usp=drive_link)
-PPT(https://docs.google.com/presentation/d/13LoCdAoxrrGO961cXUB8EvEseO9uuHCu/edit?usp=drive_link&ouid=100723159922975968796&rtpof=true&sd=true)
+
+
+PPT(https://docs.google.com/presentation/d/13iYgaFI1dmymSbxovXvOYt6SAv2-nvU1/edit?usp=drive_link&ouid=100723159922975968796&rtpof=true&sd=true)
