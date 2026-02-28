@@ -36,7 +36,7 @@ python main.py
 - Python · OpenCV · NumPy · pyttsx3
 
 ## Demo Video
-▶ [Watch Demo](https://drive.google.com/file/d/1nQTDPVqGf8kMqc8njFGQV9NoNOBbn7EW/view?usp=drive_link)
+▶ [Watch Demo](https://drive.google.com/file/d/1nQTDPVqGf8kMqc8njFGQV9NoNOBbn7EW/view?usp=sharing)
 
 
-PPT(https://docs.google.com/presentation/d/13iYgaFI1dmymSbxovXvOYt6SAv2-nvU1/edit?usp=drive_link&ouid=100723159922975968796&rtpof=true&sd=true)
+PPT(https://docs.google.com/presentation/d/13iYgaFI1dmymSbxovXvOYt6SAv2-nvU1/edit?usp=sharing&ouid=100723159922975968796&rtpof=true&sd=true)
