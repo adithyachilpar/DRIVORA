@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farming Assistant - AgriVerse AI</title>
+    <!-- Same Tailwind as other pages -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Same Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Same custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Chat specific styles - matches your green theme */
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom scrollbar - matches your theme */
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #16a34a;
+            border-radius: 10px;
+        }
+        
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: #15803d;
+        }
+        
+        /* Message animations */
+        .message {
+            animation: slideIn 0.3s ease-out;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* User message - green theme */
+        .user-message {
+            background-color: #16a34a;
+            color: white;
+            border-radius: 18px 18px 4px 18px;
+            margin-left: auto;
+            box-shadow: 0 2px 5px rgba(22, 163, 74, 0.2);
+        }
+        
+        /* Bot message - light gray like other pages */
+        .bot-message {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            border-radius: 18px 18px 18px 4px;
+            margin-right: auto;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Typing indicator - green theme */
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #f3f4f6;
+            padding: 12px 16px;
+            border-radius: 18px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #16a34a;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; opacity: 0.7; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; opacity: 0.4; }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-8px); }
+        }
+        
+        /* Suggestion chips - matches your card style */
+        .suggestion-chip {
+            background: white;
+            border: 1px solid #e5e7eb;
+            color: #4b5563;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .suggestion-chip:hover {
+            background-color: #16a34a;
+            color: white;
+            border-color: #16a34a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(22, 163, 74, 0.3);
+        }
+        
+        /* Input area - matches your input fields */
+        .input-area {
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        
+        .input-area:focus-within {
+            border-color: #16a34a;
+            ring: 2px solid #16a34a;
+        }
+        
+        /* Send button - matches your primary button */
+        .send-button {
+            background-color: #16a34a;
+            color: white;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .send-button:hover {
+            background-color: #15803d;
+            transform: scale(1.02);
+        }
+        
+        .send-button:active {
+            transform: scale(0.98);
+        }
+        
+        /* Clear button - matches your secondary button */
+        .clear-button {
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .clear-button:hover {
+            background-color: #e5e7eb;
+        }
+        
+        /* Chat header - matches your page headers */
+        .chat-header {
+            border-bottom: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen">
+        <!-- Sidebar - EXACT same as your other pages -->
+        <div class="w-64 bg-white shadow-lg fixed h-full flex flex-col">
+            <div class="p-6 border-b">
+                <h1 class="text-2xl font-bold text-green-600">🌱 AgriVerse AI</h1>
+                <p class="text-sm text-gray-500 mt-1">Smart Farming Assistant</p>
+            </div>
+            
+            <nav class="p-4 flex-1">
+                <a href="index.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-home w-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="weather.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-cloud-sun w-5"></i>
+                    <span>Weather</span>
+                </a>
+                <a href="crops.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-seedling w-5"></i>
+                    <span>Crop Recommendations</span>
+                </a>
+                <a href="disease.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-leaf w-5"></i>
+                    <span>Disease Detection</span>
+                </a>
+                <a href="market.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-chart-line w-5"></i>
+                    <span>Market Prices</span>
+                </a>
+                <a href="chatbot.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 bg-green-50 text-green-600">
+                    <i class="fas fa-robot w-5"></i>
+                    <span>Farming Assistant</span>
+                </a>
+                <a href="add-farm.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 text-green-600 hover:bg-green-50 mt-4">
+                    <i class="fas fa-plus-circle w-5"></i>
+                    <span>Add New Farm</span>
+                </a>
+                <button onclick="logout()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 mt-auto">
+                    <i class="fas fa-sign-out-alt w-5"></i>
+                    <span>Logout</span>
+                </button>
+            </nav>
+            
+            <div class="p-4 border-t">
+                <div class="bg-green-50 p-4 rounded-lg" id="user-info">
+                    <p class="text-sm text-green-800 font-medium">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="ml-64 flex-1 p-8 overflow-hidden">
+            <div class="bg-white rounded-lg shadow-lg h-full flex flex-col">
+                <!-- Chat Header - matches your page headers -->
+                <div class="chat-header p-6">
+                    <h1 class="text-2xl font-bold text-gray-900">🤖 Farming Assistant</h1>
+                    <p class="text-gray-600 mt-1">Ask me anything about farming, crops, and diseases</p>
+                </div>
+                
+                <!-- Chat Messages Area -->
+                <div id="chat-messages" class="chat-container flex-1 bg-gray-50">
+                    <!-- Welcome Message -->
+                    <div class="flex justify-start mb-4">
+                        <div class="message bot-message p-4">
+                            <p class="text-gray-800">👋 Namaste! I'm your farming assistant. How can I help you today?</p>
+                            <p class="text-xs text-gray-500 mt-2">Just now</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Suggestion Chips -->
+                <div class="px-6 pb-4">
+                    <p class="text-sm text-gray-600 mb-2">Suggested questions:</p>
+                    <div id="suggestion-chips" class="flex flex-wrap gap-2">
+                        <span class="suggestion-chip">🌱 What crops for Maharashtra?</span>
+                        <span class="suggestion-chip">🍅 Tomato disease treatment</span>
+                        <span class="suggestion-chip">🌾 Best fertilizer for wheat</span>
+                        <span class="suggestion-chip">📅 When to harvest paddy?</span>
+                        <span class="suggestion-chip">🐛 Organic pest control</span>
+                    </div>
+                </div>
+                
+                <!-- Input Area -->
+                <div class="p-6 pt-2 border-t">
+                    <div class="flex space-x-2">
+                        <div class="input-area flex-1 flex items-center px-4">
+                            <input type="text" id="message-input" 
+                                   placeholder="Type your question here..."
+                                   class="w-full py-3 bg-transparent focus:outline-none">
+                        </div>
+                        <button onclick="sendMessage()" class="send-button">
+                            <i class="fas fa-paper-plane mr-2"></i>Send
+                        </button>
+                        <button onclick="clearChat()" class="clear-button">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2 text-center">
+                        Powered by Gemini AI • Ask anything about farming
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        let sessionId = null;
+        let isLoading = false;
+
+        // Load user info
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = getUser();
+            if (user) {
+                document.getElementById('user-info').innerHTML = `
+                    <p class="text-sm text-green-800 font-medium">${user.name}</p>
+                    <p class="text-xs text-green-600 mt-1">Farmer</p>
+                `;
+            }
+        });
+
+        async function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (!message || isLoading) return;
+            
+            input.value = '';
+            addMessage(message, 'user');
+            showTypingIndicator();
+            isLoading = true;
+            
+            try {
+                const token = getToken();
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const response = await fetch('http://localhost:8000/api/chatbot/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: sessionId
+                    })
+                });
+
+                const data = await response.json();
+                hideTypingIndicator();
+                
+                if (response.ok) {
+                    sessionId = data.session_id;
+                    addMessage(data.response, 'bot');
+                } else {
+                    addMessage('Error: ' + (data.detail || 'Something went wrong'), 'bot');
+                }
+            } catch (error) {
+                hideTypingIndicator();
+                addMessage('Connection error. Please check your connection.', 'bot');
+                console.error('Chat error:', error);
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        function addMessage(text, sender) {
+            const container = document.getElementById('chat-messages');
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex justify-${sender === 'user' ? 'end' : 'start'} mb-4`;
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="message user-message p-4">
+                        <p class="text-white">${text}</p>
+                        <p class="text-xs text-green-100 mt-2">${time}</p>
+                    </div>
+                `;
+            } else {
+                const formattedText = text.replace(/\n/g, '<br>');
+                messageDiv.innerHTML = `
+                    <div class="message bot-message p-4">
+                        <p class="text-gray-800">${formattedText}</p>
+                        <p class="text-xs text-gray-500 mt-2">${time}</p>
+                    </div>
+                `;
+            }
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const container = document.getElementById('chat-messages');
+            const indicatorDiv = document.createElement('div');
+            indicatorDiv.id = 'typing-indicator';
+            indicatorDiv.className = 'flex justify-start mb-4';
+            indicatorDiv.innerHTML = `
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            container.appendChild(indicatorDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) indicator.remove();
+        }
+
+        function clearChat() {
+            if (confirm('Clear chat history?')) {
+                document.getElementById('chat-messages').innerHTML = `
+                    <div class="flex justify-start mb-4">
+                        <div class="message bot-message p-4">
+                            <p class="text-gray-800">👋 Chat cleared! How can I help you?</p>
+                            <p class="text-xs text-gray-500 mt-2">Just now</p>
+                        </div>
+                    </div>
+                `;
+                sessionId = null;
+            }
+        }
+
+        document.getElementById('message-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

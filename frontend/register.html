@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - AgriVerse AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div>
+                <h1 class="text-center text-4xl font-bold text-green-600">🌱 AgriVerse AI</h1>
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                    Create new account
+                </h2>
+            </div>
+            
+            <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded"></div>
+            <div id="debug-info" class="hidden bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded"></div>
+            <div id="success-message" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded"></div>
+            
+            <form class="mt-8 space-y-6" onsubmit="handleRegister(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                        <input id="name" name="name" type="text" required 
+                               class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                               placeholder="Enter your full name">
+                    </div>
+                    
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                        <input id="phone" name="phone" type="tel" required 
+                               class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" 
+                               placeholder="10 digit number" pattern="[0-9]{10}" title="Please enter a 10-digit phone number">
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email (Optional)</label>
+                        <input id="email" name="email" type="email" 
+                               class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                               placeholder="your@email.com">
+                    </div>
+                    
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input id="password" name="password" type="password" required minlength="6"
+                               class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" 
+                               placeholder="Minimum 6 characters">
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        Create Account
+                    </button>
+                </div>
+                
+                <div class="text-center">
+                    <a href="login.html" class="font-medium text-green-600 hover:text-green-500">
+                        Already have an account? Sign in
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            // Get form values
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value || null;
+            const password = document.getElementById('password').value;
+            
+            // Get message divs
+            const errorDiv = document.getElementById('error-message');
+            const debugDiv = document.getElementById('debug-info');
+            const successDiv = document.getElementById('success-message');
+            
+            // Hide previous messages
+            errorDiv.classList.add('hidden');
+            successDiv.classList.add('hidden');
+            
+            // Show debug
+            debugDiv.classList.remove('hidden');
+            debugDiv.innerHTML = '⏳ Attempting registration...';
+            
+            try {
+                console.log('Registering with:', { name, phone, email, password: '***' });
+                
+                const result = await register(name, phone, email, password);
+                
+                if (result.success) {
+                    debugDiv.innerHTML = '✅ Registration successful! Redirecting to dashboard...';
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                } else {
+                    debugDiv.classList.add('hidden');
+                    errorDiv.textContent = '❌ ' + (result.error || 'Registration failed');
+                    errorDiv.classList.remove('hidden');
+                    console.error('Registration error:', result.error);
+                }
+            } catch (error) {
+                debugDiv.classList.add('hidden');
+                errorDiv.textContent = '❌ Error: ' + error.message;
+                errorDiv.classList.remove('hidden');
+                console.error('Registration exception:', error);
+            }
+        }
+        
+        // Redirect if already logged in
+        if (isLoggedIn()) {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

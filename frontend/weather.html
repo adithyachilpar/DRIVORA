@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather - AgriVerse AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg fixed h-full flex flex-col">
+            <div class="p-6 border-b">
+                <h1 class="text-2xl font-bold text-green-600">🌱 AgriVerse AI</h1>
+                <p class="text-sm text-gray-500 mt-1">Smart Farming Assistant</p>
+            </div>
+            
+            <nav class="p-4 flex-1">
+                <a href="index.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-home w-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="weather.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 bg-blue-50 text-blue-600">
+                    <i class="fas fa-cloud-sun w-5"></i>
+                    <span>Weather</span>
+                </a>
+                <a href="crops.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-seedling w-5"></i>
+                    <span>Crop Recommendations</span>
+                </a>
+                <a href="disease.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-leaf w-5"></i>
+                    <span>Disease Detection</span>
+                </a>
+                <a href="market.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-chart-line w-5"></i>
+                    <span>Market Prices</span>
+                </a>
+                <a href="nearby.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-warehouse w-5"></i>
+                    <span>Nearby Places</span>
+                </a>
+                <!-- CHATBOT LINK ADDED HERE -->
+                <a href="chatbot.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-robot w-5"></i>
+                    <span>Farming Assistant</span>
+                </a>
+                
+                <a href="add-farm.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 text-green-600 hover:bg-green-50 mt-4">
+                    <i class="fas fa-plus-circle w-5"></i>
+                    <span>Add New Farm</span>
+                </a>
+                
+                <button onclick="logout()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 mt-auto">
+                    <i class="fas fa-sign-out-alt w-5"></i>
+                    <span>Logout</span>
+                </button>
+            </nav>
+            
+            <div class="p-4 border-t">
+                <div class="bg-green-50 p-4 rounded-lg" id="user-info">
+                    <p class="text-sm text-green-800 font-medium">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="ml-64 flex-1 p-8 overflow-y-auto" id="main-content">
+            <!-- Weather content will be loaded here -->
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/weather.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = getUser();
+            if (user) {
+                document.getElementById('user-info').innerHTML = `
+                    <p class="text-sm text-green-800 font-medium">${user.name}</p>
+                    <p class="text-xs text-green-600 mt-1">Farmer</p>
+                `;
+            }
+            loadWeatherPage();
+        });
+    </script>
+</body>
+</html>

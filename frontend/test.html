@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h2>Testing Backend Connection</h2>
+    <button onclick="testAPI()">Test Weather API</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const result = document.getElementById('result');
+            result.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/weather/current/1');
+                const data = await response.json();
+                result.innerHTML = '<pre style="color:green">✅ SUCCESS!<br>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                result.innerHTML = '<p style="color:red">❌ Error: ' + error.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>
